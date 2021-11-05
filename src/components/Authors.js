@@ -2,14 +2,14 @@
 import React from 'react'
 import { useQuery } from '@apollo/client'
 
-import AuthorBirthyear from './AuthorBirthyear'
+import AuthorForm from './AuthorForm'
 
 import { ALL_AUTHORS } from '../queries'
 
-const Authors = (props) => {
+const Authors = ({ show, setError, authenticated }) => {
   const { loading, data: { allAuthors: authors } = {} } = useQuery(ALL_AUTHORS)
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
@@ -42,7 +42,7 @@ const Authors = (props) => {
           )}
         </tbody>
       </table>
-      <AuthorBirthyear setError={props.setError} authors={authors}/>
+      { authenticated && <AuthorForm setError={setError} authors={authors}/> }
     </div>
   )
 }

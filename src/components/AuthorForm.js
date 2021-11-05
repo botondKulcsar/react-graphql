@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { ALL_AUTHORS, UPDATE_AUTHOR } from '../queries'
 
-const AuthorBirthyear = ({ setError, authors }) => {
+const AuthorForm = ({ setError, authors }) => {
     const [updateAuthor, result] = useMutation(UPDATE_AUTHOR, {
         refetchQueries: [{ query: ALL_AUTHORS }],
         onError: (error) => {
@@ -55,4 +55,4 @@ const AuthorBirthyear = ({ setError, authors }) => {
     )
 }
 
-export default AuthorBirthyear
+export default AuthorForm
