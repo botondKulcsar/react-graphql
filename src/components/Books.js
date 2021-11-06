@@ -7,6 +7,7 @@ const Books = (props) => {
   const { loading, data: { allBooks: books } = {} } = useQuery(ALL_BOOKS)
 
   const [selectedBooks, setSelectedBooks] = useState([])
+  const [category, setCategory] = useState('all genres')
 
   useEffect(() => {
     setSelectedBooks(books)
@@ -27,6 +28,7 @@ const Books = (props) => {
   const selectCategory = (genre) => {
     const booksOfGenre = books.filter(book => book.genres.includes(genre))
     setSelectedBooks(booksOfGenre)
+    setCategory(genre)
   }
 
 
@@ -38,14 +40,8 @@ const Books = (props) => {
   return (
     <div>
       <h2>books</h2>
-      <p>Genres</p>
-      <button onClick={() => setSelectedBooks(books)}>all</button>
-      {Object.keys(genres).map(genre =>
-        <button
-          onClick={() => selectCategory(genre)}
-          key={genre}>
-          {genre}
-        </button>)}
+      <p>in genre <strong>{category}</strong></p>
+     
 
       <table>
         <tbody>
@@ -67,7 +63,13 @@ const Books = (props) => {
           )}
         </tbody>
       </table>
-      
+      <button onClick={() => setSelectedBooks(books)}>all</button>
+      {Object.keys(genres).map(genre =>
+        <button
+          onClick={() => selectCategory(genre)}
+          key={genre}>
+          {genre}
+        </button>)}
     </div>
   )
 }
