@@ -1,35 +1,42 @@
 import React, { useEffect, useState } from 'react'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery, useQuery } from '@apollo/client'
 
 import { ALL_BOOKS } from '../queries'
 
 const Books = (props) => {
-  const { loading, data: { allBooks: books } = {} } = useQuery(ALL_BOOKS)
+  const result = useQuery(ALL_BOOKS)
+
+  const [filterBooks, {loading, data }] = useLazyQuery(ALL_BOOKS)
 
   const [selectedBooks, setSelectedBooks] = useState([])
-  const [category, setCategory] = useState('all genres')
+  const [category, setCategory] = useState(null)
+
+  console.log('books', data)
 
   useEffect(() => {
-    setSelectedBooks(books)
-  }, [books])
+    filterBooks({ variables: { genre: category } })
+    setSelectedBooks(data?.allBooks)
+  }, [data, category])
 
-  if (loading) {
+  if (loading || result.loading) {
     return (
       <div>loading...</div>
     )
   }
-  const genres = books.reduce((a, book) => {
+  const genres = result.data.allBooks.reduce((a, book) => {
     for (const genre of book.genres) {
       a[genre] = true
     }
     return a
   }, {})
 
-  const selectCategory = (genre) => {
-    const booksOfGenre = books.filter(book => book.genres.includes(genre))
-    setSelectedBooks(booksOfGenre)
-    setCategory(genre)
-  }
+  // const selectCategory = (category) => {
+  //   // const booksOfGenre = books.filter(book => book.genres.includes(genre))
+  //   // setSelectedBooks(booksOfGenre)
+  //   // filterBooks({ variables: { genre: 'crime' } })
+  //   setCategory(category)
+  //   // filterBooks({ variables: { genre: category } })
+  // }
 
 
   if (!props.show) {
@@ -40,7 +47,7 @@ const Books = (props) => {
   return (
     <div>
       <h2>books</h2>
-      <p>in genre <strong>{category}</strong></p>
+      <p>in genre <strong>{category ?? 'all'}</strong></p>
      
 
       <table>
@@ -54,7 +61,7 @@ const Books = (props) => {
               published
             </th>
           </tr>
-          {selectedBooks.map(a =>
+          {selectedBooks?.map(a =>
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
@@ -63,10 +70,10 @@ const Books = (props) => {
           )}
         </tbody>
       </table>
-      <button onClick={() => setSelectedBooks(books)}>all</button>
+      <button onClick={() => setCategory(null)}>all</button>
       {Object.keys(genres).map(genre =>
         <button
-          onClick={() => selectCategory(genre)}
+          onClick={() => setCategory(genre)}
           key={genre}>
           {genre}
         </button>)}
