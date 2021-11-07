@@ -15,7 +15,25 @@ const NewBook = (props) => {
       console.error(error)
       props.setError(error.graphQLErrors[0]?.message ?? 'invalid input')
     },
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }]
+    // refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }]
+    update: (store, response) => {
+      const booksInStore = store.readQuery({ query: ALL_BOOKS })
+      store.writeQuery({
+        query: ALL_BOOKS,
+        data: {
+          ...booksInStore,
+          allBooks: [ ...booksInStore.allBooks, response.data.addBook]
+        }
+      })
+      const authorsInStore = store.readQuery({ query: ALL_AUTHORS })
+      store.writeQuery({
+        query: ALL_AUTHORS,
+        data: {
+          ...authorsInStore,
+          allAuthors: [ ...authorsInStore.allBooks, response.data.addAuthors]
+        }
+      })
+    }
   })
 
   if (!props.show) {
